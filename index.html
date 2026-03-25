@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>무지개 너머, 댕댕이 학교</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000; overflow: hidden;
+            font-family: 'Nanum Myeongjo', serif;
+        }
+
+        /* 시작 버튼 레이어 */
+        #entry-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 999;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: opacity 1s ease;
+        }
+
+        .start-button {
+            padding: 15px 50px; border: 1px solid rgba(255, 255, 255, 0.4);
+            background: none; color: #fff; font-family: 'Nanum Myeongjo', serif;
+            font-size: 1.1rem; letter-spacing: 0.3rem; cursor: pointer;
+            transition: 0.3s;
+        }
+        .start-button:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
+
+        /* 영상 컨테이너 */
+        #video-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; display: flex; justify-content: center; align-items: center;
+        }
+
+        video { width: 100%; height: 100%; object-fit: contain; background-color: #000; }
+
+        /* 스킵 버튼 스타일 */
+        #skip-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            padding: 8px 20px; background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem; letter-spacing: 0.1rem;
+            border-radius: 5px; cursor: pointer; z-index: 500;
+            display: none; transition: 0.3s;
+        }
+        #skip-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; border-color: #fff; }
+
+        /* 엔딩 화이트아웃 효과 */
+        #white-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 1000; opacity: 0;
+            pointer-events: none; transition: opacity 1s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="entry-layer" onclick="beginAdventure()">
+        <button class="start-button">입장하기</button>
+    </div>
+
+    <button id="skip-btn" onclick="triggerEnding()">SKIP</button>
+
+    <div id="video-container">
+        <video id="main-video" playsinline>
+            <source src="coco.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div id="white-layer"></div>
+
+    <script>
+        const video = document.getElementById('main-video');
+        const entryLayer = document.getElementById('entry-layer');
+        const whiteLayer = document.getElementById('white-layer');
+        const skipBtn = document.getElementById('skip-btn');
+        let endingTriggered = false;
+
+        function beginAdventure() {
+            entryLayer.style.opacity = '0';
+            video.play().then(() => {
+                setTimeout(() => {
+                    entryLayer.style.display = 'none';
+                    skipBtn.style.display = 'block';
+                }, 1000);
+            }).catch(error => {
+                alert("영상을 재생할 수 없습니다. coco.mp4 파일이 같은 폴더에 있는지 확인해주세요.");
+            });
+        }
+
+        video.addEventListener('timeupdate', function() {
+            const timeLeft = video.duration - video.currentTime;
+            // 영상 종료 1초 전 자동 엔딩 처리
+            if (timeLeft <= 1.0 && !endingTriggered) {
+                endingTriggered = true;
+                triggerEnding();
+            }
+        });
+
+        function triggerEnding() {
+            // 중복 실행 방지
+            if (endingTriggered && event && event.type === 'click') return;
+            endingTriggered = true;
+            
+            skipBtn.style.opacity = '0';
+            whiteLayer.style.opacity = '1';
+            
+            setTimeout(() => {
+                video.pause();
+                // 알림창 확인 후 jj.html로 이동
+                alert("어서오세요. 당신을 기다리고 있는 아이들이 있습니다.");
+                window.location.href = "jj.html"; 
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
